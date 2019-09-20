@@ -1,0 +1,115 @@
+/*Vytvořte třídu Date reprezentující datum (udělejte metody pro výpis a porovnání 2 dat)
+Vytvořte třídu Person reprezentující osobu. Každá osoba má jméno, příjmení, pohlaví (vytvořte enum class) a datum narození (použijte výše vytvořenou třídu Date).
+Dynamicky naalokujte pole 5 osob a každou osobu vypište na standardní výstup. Toto naimplementujte bez bezparametrického konstruktoru třídy Person. (Hint: pointery) Uvědomte si, proč nejde vytvořit pole objektů, které nemají bezparametrický konstruktor.
+Seřaďte osoby v kolekci podle věku a znovu vypište. Neimplementujte vlastní sort, použijte knihovní std::sort, kterému předáte komparátor (funkci, lambda funkci, funktor).
+*/
+
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Date {
+	private:
+		int year, month, day;
+
+	public:
+		//konstruktor
+		Date(int year, int month, int day) {
+			setYear(year);
+			setMonth(month);
+			setDay(day);
+		}
+
+		//bezparametricky konstruktor
+		/*	Date() {
+
+			}
+			*/
+
+		int getYear() const {
+			return year;
+		}
+
+		void setYear(int year) {
+			if (year >= 0) {
+				this -> year = year;
+			} else cerr << "error year" << endl;
+		}
+
+		int getMonth() const {
+			return month;
+		}
+
+		void setMonth(int month) {
+			if (month >= 1 && month <= 12) {
+				this -> month = month;
+			} else cerr << "error month" << endl;
+		}
+
+		int getDay() const{
+			return day;
+		}
+
+		void setDay(int day) {
+			if (day >= 1 && day <= 31) {
+				this -> day = day;
+			} else cerr << "error day" << endl;
+		}
+
+		void print() const { //konstantni metoda, lze ji volat na konstantnich i nekonstantnich objektech. Nemeni vnitrni stav
+			cout << year << "/" << month << "/" << day << endl;
+		}
+
+		// Vracime <0 kdyz *this je mensi nez other, 0 rovno, >0 vetsi
+		int compare(const Date & other) const { //konstantni reference v argumentu - objekt other nemuzeme menit
+			int result = year - other.year;
+			if (result != 0) return result;
+			result = month - other.month;
+			if (result != 0) return result;
+			return day - other.day;
+		}
+};
+
+enum class Sex { // enum class je typesafe enum
+	MALE,
+	FEMALE,
+	OTHER,
+	GDPR_CENSORED
+};
+
+string sexToString ( const Sex & sex ) {
+	switch ( sex ) {
+		case Sex::MALE: return "MALE";
+		case Sex::FEMALE: return "FEMALE";
+		case Sex::OTHER: return "OTHER";
+		case Sex::GDPR_CENSORED: return "GDPR_CENSORED";
+		default: return "??";
+	}
+}
+
+class Person {
+	private:
+		string firstName, lastName;
+		Sex sex;
+		Date birthDate;
+
+	public:
+		Person(const string & firstName, const string & lastName, const Sex sex, const Date & datum) : firstName(firstName), lastName(lastName), sex(sex), birthDate(datum) {
+		}
+
+		void print() const {
+			cout << firstName << ", " << lastName << ", " << sexToString ( sex ) << ", ";
+			birthDate.print();
+		}
+};
+
+int main() {
+	const Date d (2019, 2, 28);
+	//Date d1;
+	Person p ("Stepan", "Plachy", Sex::GDPR_CENSORED, d);
+	p.print();
+	//d2.print();
+}
+
