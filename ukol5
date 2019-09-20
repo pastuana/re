@@ -1,0 +1,43 @@
+// Pouze ukazeme, jak s binarnim souborem pracovat, prepsani predchozich
+// programu, osetrovani vstupu nechame na Vas.
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+const char* fileName = "binarni-soubor.bin";
+
+int
+main(void)
+{
+  // const nemusi byt pouze globalni promenne. Pouzijte vsude, kde to ma smysl,
+  // Progtest to umi kontrolovat a cvicici u semestralek taky ;).
+  const int toWrite = 4;
+  fstream fileStream;
+  // C++ umi pretezovat funkce, coz zkracene znamena, ze se muze vice funkci
+  // jmenovat stejne, pokud prijimaji ruzne parametry. Standardni knihovna
+  // pretezuje metodu `open`, tato dvouparametrova varianta jako druhy parametr
+  // bere, jak se streamem ma pracovat. `ios::binary` rika, ze se k souboru ma
+  // chovat jako k binarnimu, `ios::in` rika, ze do streamu hodlame zapisovat.
+  //
+  // | neni nic jineho nez operator bitoveho or.
+  fileStream.open(fileName, ios::out | ios::binary);
+  // Do binarnich souboru se nezapisuje operatorem, ale metodou write. Ta jako
+  // prvni parametr ocekava ukazatel na misto, jehoz obsah se bude zapisovat,
+  // druhy parametr rika, kolik bajtu se zapisuje.
+  fileStream.write((char*)&toWrite, sizeof toWrite);
+  fileStream.close();
+
+  // `ios::in` rika, ze chceme cist. Stream znovu otevirame, abychom se
+  // posunuli na zacatek. Jde to udelat i metodou `seekg`, toto pro ucely
+  // demonstrace staci.
+  fileStream.open(fileName, ios::in | ios::binary);
+  int read;
+  // Ke cteni binarniho souboru se pouziva metoda `read`. Parametry podobne
+  // jako u `write`.
+  fileStream.read((char*)&read, sizeof(read));
+  cout << "Precetl jsem '" << read << "'." << endl;
+
+  return 0;
+}
+

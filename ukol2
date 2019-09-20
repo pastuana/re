@@ -1,0 +1,44 @@
+#include <iostream>
+#include <iomanip>
+// Praci se soubory zajistuje knihovna <fstream>.
+#include <fstream>
+
+using namespace std;
+
+// Misto magickych konstant definujeme konstantu BUFFER_SIZE. Zprehlednuje to
+// kod a umoznuje snadne zmeny -- nemusime hledat, kde vsude se pouziva 256.
+// Navic bychom museli premyslet, jestli je 256 jako 256.
+// 
+// Klicove slovo `const` nam rika, ze obsah promenne se za behu programu nebude
+// menit. Nicmene toho docilit lze, coz vsak naznacuje spatny navrh programu a
+// budeme trestat v semestralni praci a v code review!
+const int BUFFER_SIZE = 256;
+
+int
+main(void)
+{
+  char fileName[BUFFER_SIZE];
+  int toWrite;
+  if (!(cin >> setw(BUFFER_SIZE) >> fileName >> toWrite)) {
+    cerr << "Nespravny vstup." << endl;
+  }
+
+  // `ofstream` je trida (prozatim si predstavte strukturu, ktera si navic umi
+  // volat na sebe funkce) pro praci se soubory. Pismeno 'o' na zacatku znaci
+  // output -- mel by se pouzivat jen na vystup.
+  ofstream outputStream;
+  // Abychom stream mohli pouzit, musime mu nejprve rict, jaky soubor ma
+  // otevrit. To se provede metodou (zjistite pozdeji) `open`.
+  outputStream.open(fileName);
+
+  // Do souboru zapisujeme uplne stejne jako do vystupniho streamu `cout`! To
+  // naznacuje, ze prace se souborem a standardnim vystupem je v jistem smyslu
+  // stejna.
+  outputStream << toWrite << endl;
+
+  // A nakonec po sobe uklidime (uvidite priste, ze za jistych okolnosti
+  // neni potreba delat manualne).
+  outputStream.close();
+  return 0;
+}
+

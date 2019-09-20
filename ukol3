@@ -1,0 +1,70 @@
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+
+using namespace std;
+
+const int BUFFER_SIZE = 256;
+
+int
+main(void)
+{
+  // Retezcove literaly muzeme kvuli citelnosti rozdelit na vice radku.
+  cout << "Zadejte pocet prvku pole, nazev souboru pro ulozeni"
+          " a nasledne jeho obsah:" << endl;
+  int arraySize;
+  char fileName[BUFFER_SIZE];
+  int* array;
+  // Krome uspesneho nacteni bychom nejspise chteli, aby pole obsahovalo alespon
+  // jeden prvek.
+  if (!(cin >> arraySize >> setw(BUFFER_SIZE) >> fileName) || arraySize < 1) {
+    cerr << "Nespravny vstup." << endl;
+    return 1;
+  }
+
+  // V C++ alokaci neprovadime pomoci funkce `malloc`, ale operatorem(!) `new`.
+  // Vsimnete si, ze se nemusi includovat <stdlib.h> (resp. C++ varianta
+  // <cstdlib>), protoze se jedna o operator. Michani funkce `malloc` s
+  // operatorem `delete` nebo operatoru `new` a funkce `free` zpusobi segfault!
+  //
+  // Alokaci take usnadnuje to, ze muzeme specifikovat typ, ktery se ma
+  // alokovat, nejsou nutne zadne triky se sizeof.
+  //
+  // V neposledni rade si vsimneme, ze pocet prvku pole se urcuje pomoci
+  // `[pocet prvku pole]` za nazvem datoveho typu.
+  array = new int[arraySize];
+
+  // V C jsme byli zvykli posledni cast psat jako `i++`. U cisel je to jedno,
+  // u iteratoru (uvidite pozdeji) je to zbytecne zpomaleni programu.
+  for (int i = 0; i < arraySize; ++i) {
+    if (!(cin >> array[i])) {
+      cerr << "Nepodarilo se nacist " << i + 1 << ". prvek pole." << endl;
+      return 2;
+    }
+  }
+
+  ofstream outputStream;
+  outputStream.open(fileName);
+  // V tomto programu navic kontrolujeme, zda se podarilo soubor otevrit.
+  if (!outputStream.is_open()) {
+    cerr << "Nepodarilo se otevrit soubor." << endl;
+  }
+  outputStream << arraySize << endl;
+  // Jak docilit toho, aby za poslednim cislem nebyla zbytecna mezera? Muzeme
+  // napriklad nejprve vypsat nulte cislo a pred kazdym dalsim mezeru. Vyse
+  // jsme zvalidovali, ze pole ma alespon jedno cislo, nezpusobi se tedy
+  // segfault.
+  outputStream << array[0];
+  for (int i = 1; i < arraySize; ++i) {
+    outputStream << " " << array[i];
+  }
+  outputStream << endl;
+  
+  // Kdybychom uvolnovali `int`, tak se pouzije pouze `delete`. Uvolnujeme vsak
+  // pole, proto `delete []`. To se nesmi michat, jinak zpusobite segfault
+  // (nebo neco horsiho).
+  delete [] array;
+  outputStream.close();
+  return 0;
+}
+
