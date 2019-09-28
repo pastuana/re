@@ -1,0 +1,146 @@
+/* Vytvořte třídu komplexních čísel a implementujte následující operátory a operace:
+
+aritmetické (+, -, *, /), mínus unární i binární ( operace i s číslem, tedy dbl op Complex a Complex op dbl)
+výpis do streamu («) ve tvaru (1+2i) případně (1-2i)
+operátor ~ pro komplexně sdružené číslo
+přiřazovací (+=, -=, *=, /=)
+absolutní hodnota, hodí se i její druhá mocnina
+porovnávací operátory (==, !=, <, < =, >, >=), kde porovnání je primárně podle reálné složky a sekundárně podle imaginární
+
+Hint: Naimplementujte nejdříve operátor < a pomocí něho definujte postupně další operátory a pomocí nich zase další…
+
+
+operátory inkrementace a dekrementace v postfixové i prefixové variantě (++, –), inkrementace je definována jako +=1, dekrementace jako -= 1
+
+Seznam operátorů
+
+https://en.wikipedia.org/wiki/Operators_in_C_and_C%2B%2B
+
+Doma:
+
+Zjistěte, proč nefunguje výraz cout << ( 2 + a ) << endl;, kde a je objekt Complex. cout << ( a + 2 ) << endl by ale fungovat mělo. Navrhněte co nejrobustnější řešení, které dovolí obě varianty.
+
+Hint: Proč jsme op<< definovali tímto způsobem?
+*/
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+class Complex {
+	private:
+		double re, im;
+	public:
+		Complex(double re = 0, double im = 0) : re(re), im(im) {}
+		//Complex(double re) : re(re), im(0) {}
+		//Complex() : re(0), im(0)
+
+		double getRe() const { return re; }
+		double getIm() const { return im; }
+
+		Complex operator+(const Complex & other) const {
+			return Complex(*this) += other;
+			//return Complex(re + other.re,
+			//	       im + other.im);
+		}
+
+		//unarni
+		Complex operator-() const {
+			return Complex(-re, -im);
+		}
+
+		//binarni
+		Complex operator-(const Complex & other) const {
+			return (*this) + (-other);
+		}
+
+		Complex operator*(const Complex & other) const {
+			return Complex(re*other.re - im*other.im,
+					re*other.im + im*other.re);
+		}
+
+		Complex operator/(double other) const {
+			return Complex(re/other, im/other);
+		}
+
+		Complex operator/(const Complex & other) const {
+			return (*this) * ~other / other.absSq();
+		}
+
+		//komplexne sdruzene
+		Complex operator~() const {
+			return Complex(re, -im);
+		}
+
+		double absSq() const {
+			return (double) ((*this) * ~(*this));
+		}
+
+		double abs() const {
+			return sqrt(absSq());
+		}
+
+		//uzivatelska konverze
+		explicit operator double() const {
+			return re;
+		}
+
+		Complex & operator+=(const Complex & other) {
+			re += other.re;
+			im += other.im;
+			return *this;
+		}
+
+		bool operator<(const Complex & other) const {
+			return re < other.re || (re == other.re && im < other.im);
+		}
+
+		bool operator>(const Complex & other) const {
+			return other < (*this);
+		}
+
+		bool operator>=(const Complex & other) const {
+			return !(*this < other);
+		}
+
+		bool operator<=(const Complex & other) const {
+			return !(other < *this);
+		}
+
+		bool operator!=(const Complex & other) const {
+			return *this < other || other < *this;
+		}
+
+		bool operator==(const Complex & other) const {
+			return !(*this != other);
+		}
+
+		friend ostream & operator<<(ostream & os, const Complex & c);
+
+		Complex & operator++() {
+			return *this += 1;
+		}
+
+		Complex operator++(int /*dummy*/) {
+			Complex tmp(*this);
+			++(*this);
+			return tmp;
+		}
+
+};
+
+//(2+3i) nebo (2-3i)
+ostream & operator<<(ostream & os, const Complex & c) {
+	return os << '(' << c.re << (c.im >= 0 ? "+" : "") << c.getIm() << "i)";
+}
+
+
+int main() {
+	Complex a (3,2);
+	Complex b = a;
+	//(b += a) += a;
+	cout << b << " " <<  ~b << endl;
+	cout << b++ << " " << b << endl;
+}
+
+
